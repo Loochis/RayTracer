@@ -1,17 +1,25 @@
 package rayTracing;
 
+import shapes.Point;
+import shapes.Shape;
+import shapes.Sphere;
+
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends Canvas implements Runnable {
 
     public static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize(); // Get screen dimensions
     public static final int WIDTH = SCREENSIZE.width, HEIGHT = SCREENSIZE.height;           // Width / height component of screen dimensions
-    public static final int VRES = 5;                                             // Virtual resolution of the image
+    public static final int VRES = 2;                                             // Virtual resolution of the image
 
     private Render render = new Render();
 
     private boolean running = false;
+
+    private List<Shape> shapeList = new ArrayList<>();
 
     public Main() {
         Window window = new Window(WIDTH, HEIGHT, "Raytracer V0", this);
@@ -24,6 +32,8 @@ public class Main extends Canvas implements Runnable {
     public void start() {
         Thread thread = new Thread(this); // Create new thread
         running = true;
+        shapeList.add(new Sphere(new Point(500, 300, 200), 300, Color.BLUE));
+        shapeList.add(new Sphere(new Point(800, 600, 200), 100, Color.RED));
         thread.start();                          // Run thread
     }
 
@@ -34,11 +44,6 @@ public class Main extends Canvas implements Runnable {
     public void run() {
         while(running) {
             SceneRender();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -52,7 +57,7 @@ public class Main extends Canvas implements Runnable {
             bs = this.getBufferStrategy();
         }
         Graphics g = bs.getDrawGraphics(); // Get graphics of buffer strategy
-        render.generateImage(g);           // Pass graphics into Render for them to get drawn
+        render.generateImage(g, shapeList);           // Pass graphics into Render for them to get drawn
         g.dispose();
         bs.show(); // Draw the graphics
     }
