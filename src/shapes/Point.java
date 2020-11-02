@@ -81,4 +81,19 @@ public class Point {
     private void updatePos() { // Update array from new components
         pos = new float[] {x, y, z};
     }
+
+    /**
+     * checks if two points position are equal
+     * @param p other point to testa gainst
+     * @return true if they have equal components, false if otherwise
+     */
+    public boolean equals(Point p) {
+        if (x != p.getX())
+            return false;
+        if (y != p.getY())
+            return false;
+        if (z != p.getZ())
+            return false;
+        return true;
+    }
 }

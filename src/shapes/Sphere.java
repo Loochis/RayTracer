@@ -1,12 +1,11 @@
 package shapes;
 
 import LoochisMath.VectorMath;
+import rayTracing.Intersection;
 
 import java.awt.*;
 
 public class Sphere extends Shape{
-    private Point pos;
-    private float radius;
 
     //--- Constructors ---//
 
@@ -15,8 +14,6 @@ public class Sphere extends Shape{
      */
     public Sphere() {
         super(Color.WHITE);
-        pos = new Point();
-        radius = 1;
     }
 
     /**
@@ -27,9 +24,7 @@ public class Sphere extends Shape{
      * @param color  color of the sphere
      */
     public Sphere(Point pos, int radius, Color color) {
-        super(color);
-        this.pos = pos;
-        this.radius = radius;
+        super(pos, new Point(), radius, color);
     }
 
     //--- Getters and setters ---//
@@ -39,7 +34,7 @@ public class Sphere extends Shape{
      * @return the (Point) position of the sphere
      */
     public Point getPos() {
-        return pos;
+        return super.getPos();
     }
 
     /**
@@ -47,29 +42,28 @@ public class Sphere extends Shape{
      * @param newPos the (Point) position to move the sphere to
      */
     public void setPos(Point newPos) {
-        pos = newPos;
+        super.setPos(newPos);
     }
 
 
     @Override
     public Point[] getPoints() {
-        return new Point[] {pos};
+        return new Point[] {super.getPos()};
     }
 
     @Override
-    public Point[] collisionTest(Ray ray) {
+    public Intersection collisionTest(Ray ray) {
         ray = ray.Normalized();
-        float t = VectorMath.Dot(VectorMath.Subtract(pos, ray.getOrigin()), ray.getHead()); // Move position to 0,0 relative to ray. Get dot
+        float t = VectorMath.Dot(VectorMath.Subtract(super.getPos(), ray.getOrigin()), ray.getHead()); // Move position to 0,0 relative to ray. Get dot
         Point p = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t), ray.getOrigin()); // Find point on perpendicular plane, translate back to world space
-        float y = VectorMath.Length2(VectorMath.Subtract(pos, p)); // Distance from the center of the sphere
-        if (y > Math.pow(radius, 2)) // If the distance is greater than the radius, return no intersections
+        float y = VectorMath.Length2(VectorMath.Subtract(super.getPos(), p)); // Distance from the center of the sphere
+        if (y > Math.pow(super.getScale(), 2)) // If the distance is greater than the radius, return no intersections
             return null;
 
-        float x = (float) Math.sqrt(Math.pow(radius, 2) - y); // Distance from plane intersection to spheres surface
-        Point[] out = new Point[2];
-        out[0] = VectorMath.Multiply(ray.getHead(), t-x);
-        out[1] = VectorMath.Multiply(ray.getHead(), t+x);
+        float x = (float) Math.sqrt(Math.pow(super.getScale(), 2) - y); // Distance from plane intersection to spheres surface
+        Point p1 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t-x), ray.getOrigin());
+        Point p2 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t+x), ray.getOrigin());
 
-        return out;
+        return new Intersection(p1, p2, VectorMath.Normalize(VectorMath.Subtract(p1, super.getPos())), getColor(), t-x);
     }
 }

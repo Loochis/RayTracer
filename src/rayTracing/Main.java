@@ -1,5 +1,6 @@
 package rayTracing;
 
+import shapes.Lamp;
 import shapes.Point;
 import shapes.Shape;
 import shapes.Sphere;
@@ -13,7 +14,9 @@ public class Main extends Canvas implements Runnable {
 
     public static final Dimension SCREENSIZE = Toolkit.getDefaultToolkit().getScreenSize(); // Get screen dimensions
     public static final int WIDTH = SCREENSIZE.width, HEIGHT = SCREENSIZE.height;           // Width / height component of screen dimensions
-    public static final int VRES = 2;                                             // Virtual resolution of the image
+    public static final int VRES = 1;                                             // Virtual resolution of the image
+
+    public static final float MAX_DISTANCE = 10000; // maximum distance from camera
 
     private Render render = new Render();
 
@@ -32,9 +35,11 @@ public class Main extends Canvas implements Runnable {
     public void start() {
         Thread thread = new Thread(this); // Create new thread
         running = true;
-        shapeList.add(new Sphere(new Point(500, 300, 200), 300, Color.BLUE));
-        shapeList.add(new Sphere(new Point(800, 600, 200), 100, Color.RED));
-        thread.start();                          // Run thread
+        shapeList.add(new Sphere(new Point(800, 500, 500), 200, Color.BLUE));
+        shapeList.add(new Sphere(new Point(600, 500, 400), 100, Color.RED));
+        shapeList.add(new Lamp(new Point(300, 500, 100), 100000));
+        shapeList.add(new Lamp(new Point(1000, 1000, 100), 100000));
+        thread.start(); // Run thread
     }
 
     /**

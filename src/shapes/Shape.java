@@ -2,13 +2,27 @@ package shapes;
 
 import LoochisMath.PointMath;
 import LoochisMath.VectorMath;
+import rayTracing.Intersection;
 
 import java.awt.*;
 
 public abstract class Shape {
+
+
     private Point pos, rot; // Position / Rotation of the shape
     private float scale; // Scale of the shape
     private Color color; // Color of the shape
+
+    public Shape(Point pos, Point rot, float scale, Color color) {
+        this.pos = pos;
+        this.rot = rot;
+        this.scale = scale;
+        this.color = color;
+    }
+
+    public Point getPos() {
+        return pos;
+    }
 
     public Shape(Color color) {
         this.color = color;
@@ -97,5 +111,5 @@ public abstract class Shape {
      * @return the point(s) of intersection, null if none
      * index in order from closest to furthest from ray origin
      */
-    public abstract Point[] collisionTest(Ray ray);
+    public abstract Intersection collisionTest(Ray ray);
 }
