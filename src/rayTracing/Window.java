@@ -14,6 +14,5 @@ public class Window extends Canvas {
         frame.add(main);
         frame.pack();
         frame.setVisible(true);
-        main.start();
     }
 }

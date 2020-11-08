@@ -64,6 +64,6 @@ public class Sphere extends Shape{
         Point p1 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t-x), ray.getOrigin());
         Point p2 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t+x), ray.getOrigin());
 
-        return new Intersection(p1, p2, VectorMath.Normalize(VectorMath.Subtract(p1, super.getPos())), getColor(), t-x);
+        return new Intersection(p1, p2, VectorMath.Normalize(VectorMath.Subtract(p1, super.getPos())), getColor(), t-x, this);
     }
 }

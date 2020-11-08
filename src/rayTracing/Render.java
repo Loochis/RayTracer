@@ -11,6 +11,9 @@ import java.util.Random;
 
 public class Render {
     private static final Color BACKGROUND_COLOR = new Color(29, 29, 29);
+    private float currentBright = 2;
+    private float maxBrightness = 2;
+    private float cacheMaxBright = 2;
 
     /**
      * generates the image to draw to the screen
@@ -26,12 +29,28 @@ public class Render {
                 Ray ray = new Ray(new Point(x, y, 0), new Point(0, 0, 1), true);
                 Intersection initInter = intersectTest(ray, shapeList);
                 if (initInter != null) {
-                    float bright = brightnessCalc(initInter, shapeList);
-                    g.setColor(new Color((int) (bright * 200), (int) (bright * 200), (int) (bright * 200)));
+                    if (Main.Z_IMAGE) {
+                        float normalizedDepth = 1 - (initInter.getzDepth() / Main.MAX_DISTANCE);
+                        g.setColor(new Color(normalizedDepth, normalizedDepth, normalizedDepth));
+                    } else {
+                        float bright = brightnessCalc(initInter, shapeList);
+                        g.setColor(new Color((int) (initInter.getColor().getRed() * bright), (int) (initInter.getColor().getGreen() * bright), (int) (initInter.getColor().getBlue() * bright)));
+                    }
                 }
                 g.fillRect(x, y, Main.VRES, Main.VRES);                                                                        // Draw a pixel
             }
         }
+        maxBrightness = cacheMaxBright;
+        cacheMaxBright = 1;
+
+        if (Main.TIMED_BRIGHTNESS) {
+            if (currentBright < maxBrightness)
+                currentBright *= 1.05;
+            if (currentBright > maxBrightness)
+                currentBright /= 1.05;
+        } else
+            currentBright = maxBrightness;
+
     }
 
     /**
@@ -78,10 +97,22 @@ public class Render {
                 }
             }
         }
+
         if (numLights == 0)
             return 1f;
-        if (brightness > numLights)
-            brightness = numLights;
-        return (brightness / numLights);
+
+        if (brightness > cacheMaxBright)
+            cacheMaxBright = brightness;
+
+        if (brightness > currentBright) {
+            brightness = currentBright;
+        }
+
+        if (!Main.ADAPTIVE_EXPOSURE)
+            brightness /= numLights;
+        else
+            brightness /= currentBright;
+        brightness = (float)Math.sqrt(brightness);
+        return brightness;
     }
 }
