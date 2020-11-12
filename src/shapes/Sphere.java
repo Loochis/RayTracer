@@ -4,17 +4,21 @@ import LoochisMath.VectorMath;
 import rayTracing.Intersection;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Sphere extends Shape{
 
-    //--- Constructors ---//
+    private float roughness = 0;
 
-    /**
-     * Default constructor for sphere
-     */
-    public Sphere() {
-        super(Color.WHITE);
+    public float getRoughness() {
+        return roughness;
     }
+
+    public void setRoughness(float roughness) {
+        this.roughness = roughness;
+    }
+
+    //--- Constructors ---//
 
     /**
      * constructor with arguments
@@ -27,23 +31,20 @@ public class Sphere extends Shape{
         super(pos, new Point(), radius, color);
     }
 
-    //--- Getters and setters ---//
-
-    /**
-     * gets the position of the sphere
-     * @return the (Point) position of the sphere
-     */
-    public Point getPos() {
-        return super.getPos();
+    @Override
+    public void Translate(Point coords) {
+        super.updatePos(VectorMath.Add(super.getPos(), coords));
     }
 
-    /**
-     * sets the position of the sphere
-     * @param newPos the (Point) position to move the sphere to
-     */
-    public void setPos(Point newPos) {
-        super.setPos(newPos);
+    @Override
+    public void Scale(float scale) {
+        super.updateScale(super.getScale() + scale);
     }
+
+    @Override
+    public void Rotate(Point rot) {
+
+    } // Try to rotate a perfect sphere :/
 
 
     @Override
@@ -64,6 +65,12 @@ public class Sphere extends Shape{
         Point p1 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t-x), ray.getOrigin());
         Point p2 = VectorMath.Add(VectorMath.Multiply(ray.getHead(), t+x), ray.getOrigin());
 
-        return new Intersection(p1, p2, VectorMath.Normalize(VectorMath.Subtract(p1, super.getPos())), getColor(), t-x, this);
+        Random rand = new Random();
+        rand.setSeed((int) (p1.getX() * p1.getY() * p1.getZ())); // Base random on position
+        Point norm = VectorMath.Normalize(VectorMath.Subtract(p1, super.getPos()));
+        norm.setX((float) (norm.getX() + (rand.nextFloat() - 0.5) * roughness));
+        norm.setY((float) (norm.getY() + (rand.nextFloat() - 0.5) * roughness));
+        norm.setZ((float) (norm.getZ() + (rand.nextFloat() - 0.5) * roughness));
+        return new Intersection(p1, p2, norm, getColor(), t-x, this);
     }
 }

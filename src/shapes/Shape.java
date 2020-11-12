@@ -8,7 +8,6 @@ import java.awt.*;
 
 public abstract class Shape {
 
-
     private Point pos, rot; // Position / Rotation of the shape
     private float scale; // Scale of the shape
     private Color color; // Color of the shape
@@ -20,13 +19,106 @@ public abstract class Shape {
         this.color = color;
     }
 
+    // --- POSITION MODIFIERS --- // -----------------------------------------------------------------------------------
+
+    /**
+     * Gets the position of the shape
+     * @return the position of the shape (Point)
+     */
     public Point getPos() {
         return pos;
     }
 
-    public Shape(Color color) {
-        this.color = color;
+    /**
+     * Called by subclasses to update the position variable of the shape
+     * @param pos the new position
+     */
+    protected void updatePos(Point pos) {
+        this.pos = pos;
     }
+
+    /**
+     * Sets the position of the shape
+     * @param coords the position to set the shape to
+     */
+    public void setPos(Point coords) {
+        Translate(VectorMath.Subtract(coords, pos));
+        pos = coords;
+    }
+
+    /**
+     * Translates the shape by the specified amount
+     * @param coords the coordinates to translate the shape by
+     */
+    public abstract void Translate(Point coords);
+
+    // --- SCALE MODIFIERS --- // --------------------------------------------------------------------------------------
+
+    /**
+     * Gets the scale of the object
+     * @return the scale variable of the shape
+     */
+    public float getScale() {
+        return scale;
+    }
+
+    /**
+     * Called by subclasses to update the scale variable of the shape
+     * @param scale the new scale
+     */
+    protected void updateScale(float scale) {
+        this.scale = scale;
+    }
+
+    /**
+     * Sets the scale of the shape
+     * @param scale the new scale the shape will be
+     */
+    public void setScale(float scale) {
+        Scale(scale - this.scale);
+        this.scale = scale;
+    }
+
+    /**
+     * Scale the shape by the specified amount
+     * @param scale the amount to scale by
+     */
+    public abstract void Scale(float scale);
+
+    // --- ROTATION MODIFIERS --- // -----------------------------------------------------------------------------------
+
+    /**
+     * Gets the rotation of the object
+     * @return the rotation of the object (Point)
+     */
+    public Point getRot() {
+        return rot;
+    }
+
+    /**
+     * Called by subclasses to update the rotation variable of the shape
+     * @param rot the updated rotation
+     */
+    protected void updateRotation(Point rot) {
+        this.rot = rot;
+    }
+
+    /**
+     * Sets the rotation of the shape
+     * @param rot the rotation of the shape
+     */
+    public void setRot(Point rot) {
+        Rotate(VectorMath.Subtract(rot, this.rot));
+        this.rot = rot;
+    }
+
+    /**
+     * Rotates the shape by the specified amount
+     * @param rot the amount to rotate by
+     */
+    public abstract void Rotate(Point rot);
+
+    // --- GENERAL GETTERS AND SETTERS --- // --------------------------------------------------------------------------
 
     public Color getColor() {
         return color;
@@ -37,72 +129,11 @@ public abstract class Shape {
     }
 
     /**
-     * Updates the average point (center) of the shape
-     */
-    private void updatePos() {
-        pos = PointMath.averagePoints(getPoints());
-    }
-
-    /**
-     * Updates the rotation of the shape
-     */
-    private void updateRot() {
-    }
-
-
-    public double getScale() {
-        return scale;
-    }                // Getter for scale
-
-    public void setScale(float scale) {
-        this.scale = scale;
-    } // Setter for scale
-
-    public Point getRot() {
-        return rot;
-    }
-
-    public void setRot(Point rot) {
-        this.rot = rot;
-    }
-
-    public void rotate(Point rot) {
-        this.rot = VectorMath.Add(this.rot, rot);
-    }
-
-
-    /**
      * Gets the verticies of the shape
      *
      * @return the verticies that make up the shape
      */
     public abstract Point[] getPoints();
-
-    /**
-     * Sets the position of the center of the shape
-     *
-     * @param coords the new coordinates of the center of the shape
-     */
-    public void setPos(Point coords) {
-        Point[] points = getPoints();
-        for (Point point : points) {
-            Point difference = VectorMath.Subtract(point, pos); // Get the point in local-space
-            point = VectorMath.Add(difference, coords);         // Move the point in world-space
-        }
-        updatePos();
-    }
-
-    /**
-     * Translates the shape by the specified amount
-     *
-     * @param coords the coordinates to translate the shape by
-     */
-    public void translate(Point coords) {
-        Point[] points = getPoints();
-        for (Point point : points)
-            point = VectorMath.Add(point, coords);
-        updatePos();
-    }
 
     /**
      * Tests for a collision between a ray and the shape

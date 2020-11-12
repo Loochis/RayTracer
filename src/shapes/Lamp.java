@@ -1,34 +1,24 @@
 package shapes;
 
+import LoochisMath.VectorMath;
 import rayTracing.Intersection;
 
 import java.awt.*;
 
-public class Lamp extends Shape{
+public class Lamp extends Sphere {
 
-    private Point pos;
-    public Lamp(Point pos, float intensity) {
-        super(pos, new Point(), intensity, Color.WHITE);
-        this.pos = pos;
+    private float intensity;
+
+    public float getIntensity() {
+        return intensity;
     }
 
-    @Override
-    public Point getPos() {
-        return pos;
+    public void setIntensity(float intensity) {
+        this.intensity = intensity;
     }
 
-    @Override
-    public void setPos(Point coord) {
-        pos = coord;
-    }
-
-    @Override
-    public Point[] getPoints() {
-        return new Point[] {pos};
-    }
-
-    @Override
-    public Intersection collisionTest(Ray ray) {
-        return null;
+    public Lamp(Point pos, int radius, float intensity, Color color) {
+        super(pos, radius, color);
+        this.intensity = intensity;
     }
 }

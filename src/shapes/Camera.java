@@ -1,10 +1,12 @@
 package shapes;
 
 import LoochisMath.PointMath;
+import LoochisMath.VectorMath;
 import rayTracing.Intersection;
 import rayTracing.Main;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Camera extends Shape{
 
@@ -36,27 +38,68 @@ public class Camera extends Shape{
         super(pos, rot, zoom, null);
         this.vres = vres;
         this.ortho = ortho;
+        recalculatePoints();
     }
 
-    private void recalculatePoints() {
-        xPix = Main.WIDTH / vres; // Get number of vpixels on each dimension
-        yPix = Main.HEIGHT / vres;
+    public void recalculatePoints() {
+        xPix = Main.WIDTH; // Get number of vpixels on each dimension
+        yPix = Main.HEIGHT;
         originPoints = new Point[xPix * yPix];
         rayPoints = new Point[xPix * yPix];
 
         for (int i = 0; i < originPoints.length; i++) {
-            originPoints[i] = IDToCoord(i);
+            originPoints[i] = IDToCoord(i, new Random());
         }
     }
 
-    public Point IDToCoord(int i) {
+    public Point IDToCoord(int i, Random rand) {
         Point out = new Point();
-        out.setX(i % xPix - (int)(xPix / 2) + super.getPos().getX()); // find worldspace X
-        out.setY(Math.floorDiv(i, yPix) - (int)(yPix / 2) + super.getPos().getY()); // Find worldspace Y
+        out.setX(i % xPix - (int)(xPix / 2) + super.getPos().getX() + rand.nextFloat() * vres); // find worldspace X
+        out.setY(Math.floorDiv(i, xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres); // Find worldspace Y
         out.setZ(super.getPos().getZ()); // Find worldspace Z
-        PointMath.scaleAround(out, super.getPos(), (float) super.getScale()); // Scale point
-        PointMath.rotateAroundY(out, super.getPos(), super.getRot().getY());  // Rotate point on Y
+        out = PointMath.scaleAround(out, super.getPos(), super.getScale()); // Scale point
+        out = PointMath.rotateAroundX(out, super.getPos(), super.getRot().getX());  // Rotate point on Y
         return out;
+    }
+
+    public Point IDToRay(int i, Random rand) {
+        Point out = new Point();
+        out.setX(i % xPix - (int)(xPix / 2) + super.getPos().getX() + rand.nextFloat() * vres); // find worldspace X
+        out.setY(Math.floorDiv(i, xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres); // Find worldspace Y
+        out.setZ(super.getPos().getZ() + 1); // Find worldspace Z (add 1 to shoot in a direction)
+        out = PointMath.scaleAround(out, super.getPos(), super.getScale()); // Scale point
+        out = PointMath.rotateAroundX(out, super.getPos(), super.getRot().getX());  // Rotate point on Y
+        return out;
+    }
+
+    public int CoordsToID(int x, int y) {
+        return (x + (y * xPix));
+    }
+
+    public Point ScreenToCameraSpace(Point p) {
+        Point out = new Point();
+        out.setX(p.getX() - (int)(xPix / 2));
+        out.setY(-p.getY() + (int)(yPix / 2));
+        out = PointMath.scaleAround(out, super.getPos(), super.getScale());
+        out.setX(out.getX() + super.getPos().getX());
+        out.setY(out.getY() + super.getPos().getY());
+        out.setZ(p.getZ());
+        return out;
+    }
+
+    @Override
+    public void Translate(Point coords) {
+        super.updatePos(VectorMath.Add(super.getPos(), coords));
+    }
+
+    @Override
+    public void Scale(float scale) {
+        super.updateScale(super.getScale() + scale);
+    }
+
+    @Override
+    public void Rotate(Point rot) {
+        super.updateRotation(VectorMath.Add(super.getRot(), rot));
     }
 
     @Override

@@ -11,9 +11,9 @@ import java.util.Random;
 
 public class Render {
     private static final Color BACKGROUND_COLOR = new Color(29, 29, 29);
-    private float currentBright = 2;
-    private float maxBrightness = 2;
-    private float cacheMaxBright = 2;
+    private float currentBright = 1;
+    private float maxBrightness = 1;
+    private float cacheMaxBright = 1;
 
     /**
      * generates the image to draw to the screen
@@ -44,13 +44,14 @@ public class Render {
         cacheMaxBright = 1;
 
         if (Main.TIMED_BRIGHTNESS) {
-            if (currentBright < maxBrightness)
+            if (currentBright < maxBrightness - 0.1)
                 currentBright *= 1.05;
             if (currentBright > maxBrightness)
                 currentBright /= 1.05;
         } else
             currentBright = maxBrightness;
 
+        System.out.println(currentBright);
     }
 
     /**
@@ -81,25 +82,24 @@ public class Render {
 
     private float brightnessCalc(Intersection i, List<Shape> shapeList) {
 
-        float numLights = 0;
         float brightness = 0;
+
+        if (i.getShape() instanceof Lamp)
+            return 1;
 
         for (Object shape : shapeList) {
             if (shape instanceof Lamp) {
-                numLights++;
                 Ray ray = new Ray(i.getPos1(), ((Lamp) shape).getPos(), false); // Create a ray from point to lamp
                 ray = ray.Normalized();
-                if (intersectTest(ray, shapeList) != null) // If the ray of light is blocked, cycle
+                Intersection intersect = intersectTest(ray, shapeList);
+                if (intersect != null && intersect.getShape() != shape) // If the ray of light is blocked, cycle
                     continue;
                 float dot = VectorMath.Dot(ray.getHead(), i.getNormal()); // Get dot between normal of intersection and lamp ray
                 if (dot > 0) {
-                    brightness += ((Lamp) shape).getScale() * dot / (VectorMath.Length2(VectorMath.Subtract(((Lamp) shape).getPos(), i.getPos1()))); // inverse square of distance between lamp and intersection
+                    brightness += ((Lamp) shape).getIntensity() * dot / (VectorMath.Length2(VectorMath.Subtract(((Lamp) shape).getPos(), i.getPos1()))); // inverse square of distance between lamp and intersection
                 }
             }
         }
-
-        if (numLights == 0)
-            return 1f;
 
         if (brightness > cacheMaxBright)
             cacheMaxBright = brightness;
@@ -108,10 +108,7 @@ public class Render {
             brightness = currentBright;
         }
 
-        if (!Main.ADAPTIVE_EXPOSURE)
-            brightness /= numLights;
-        else
-            brightness /= currentBright;
+        brightness /= currentBright;
         brightness = (float)Math.sqrt(brightness);
         return brightness;
     }

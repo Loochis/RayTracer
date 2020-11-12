@@ -99,4 +99,20 @@ public class VectorMath {
 
         return out;
     }
+
+    /**
+     * Reflects a point around another point
+     * @param ray the original point
+     * @param reflect the point to reflect around
+     * @return the reflected point
+     */
+    public static Point ReflectAround(Point ray, Point reflect) {
+        float dot = Dot(ray, reflect);
+        Point out = new Point();
+        out.setX(2*dot* reflect.getX());
+        out.setY(2*dot* reflect.getY());
+        out.setZ(2*dot* reflect.getZ());
+        out = Subtract(ray, out);
+        return out;
+    }
 }
