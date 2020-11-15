@@ -55,7 +55,7 @@ public class Camera extends Shape{
     public Point IDToCoord(int i, Random rand) {
         Point out = new Point();
         out.setX(i % xPix - (int)(xPix / 2) + super.getPos().getX() + rand.nextFloat() * vres); // find worldspace X
-        out.setY(Math.floorDiv(i, xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres); // Find worldspace Y
+        out.setY((float)(Math.floor(i / xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres)); // Find worldspace Y
         out.setZ(super.getPos().getZ()); // Find worldspace Z
         out = PointMath.scaleAround(out, super.getPos(), super.getScale()); // Scale point
         out = PointMath.rotateAroundX(out, super.getPos(), super.getRot().getX());  // Rotate point on Y
@@ -65,7 +65,7 @@ public class Camera extends Shape{
     public Point IDToRay(int i, Random rand) {
         Point out = new Point();
         out.setX(i % xPix - (int)(xPix / 2) + super.getPos().getX() + rand.nextFloat() * vres); // find worldspace X
-        out.setY(Math.floorDiv(i, xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres); // Find worldspace Y
+        out.setY((float) (Math.floor(i / xPix) - (int)(yPix / 2) + super.getPos().getY() + rand.nextFloat() * vres)); // Find worldspace Y
         out.setZ(super.getPos().getZ() + 1); // Find worldspace Z (add 1 to shoot in a direction)
         out = PointMath.scaleAround(out, super.getPos(), super.getScale()); // Scale point
         out = PointMath.rotateAroundX(out, super.getPos(), super.getRot().getX());  // Rotate point on Y

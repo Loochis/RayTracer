@@ -20,9 +20,10 @@ public class Main extends Canvas implements Runnable {
     public static final boolean ADAPTIVE_EXPOSURE = true;
     public static final boolean TIMED_BRIGHTNESS = false;
 
-    public static final int VRES = 1;        // Virtual resolution of the image
+    public static final int VRES = 10;        // Virtual resolution of the image
     public static final int SAMPLES = 10;     // Number of rays per pixel
-    public static final int NUM_THREADS = 8; // MUST BE EVEN
+    public static final int MAX_BOUNCES = 2; // Number of bounces per ray
+    public static final int NUM_THREADS = 8;  // MUST BE EVEN
 
     public static final int THREAD_X = WIDTH / (NUM_THREADS / 2);
     public static final int THREAD_Y = HEIGHT / (2);
@@ -42,6 +43,8 @@ public class Main extends Canvas implements Runnable {
 
     public Camera mainCam;
 
+    private float angle = 0;
+
     public Main() {
         window = new Window(WIDTH, HEIGHT, "Raytracer V0", this);
         start();
@@ -58,9 +61,9 @@ public class Main extends Canvas implements Runnable {
         testSphere.setRoughness(0f);
         shapeList.add(testSphere);
 
-        //Sphere sphere2 = new Sphere(new Point(1500, 800, 2000), 900, new Color(0, 122, 254));
-        //sphere2.setRoughness(0f);
-        //shapeList.add(sphere2);
+        Sphere sphere2 = new Sphere(new Point(1500, 800, 2000), 900, new Color(0, 122, 254));
+        sphere2.setRoughness(0f);
+        shapeList.add(sphere2);
         Random rand = new Random();
         for (int i = 0; i < 2; i++) {
             shapeList.add(new Lamp(new Point(rand.nextInt(2000), rand.nextInt(1500), rand.nextInt(500)), 100, 1000000000, Color.WHITE));
