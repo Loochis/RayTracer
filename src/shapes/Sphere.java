@@ -52,6 +52,14 @@ public class Sphere extends Shape{
         return new Point[] {super.getPos()};
     }
 
+    public boolean IsIntersecting(Sphere sphere2) {
+        Point difference = VectorMath.Subtract(getPos(), sphere2.getPos());
+        float dist = VectorMath.Length2(difference);
+        if (dist < Math.pow(getScale() + sphere2.getScale(), 2))
+            return true;
+        return false;
+    }
+
     @Override
     public Intersection collisionTest(Ray ray) {
         ray = ray.Normalized();

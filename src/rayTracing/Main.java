@@ -19,10 +19,11 @@ public class Main extends Canvas implements Runnable {
     public static final boolean Z_IMAGE = false;
     public static final boolean ADAPTIVE_EXPOSURE = true;
     public static final boolean TIMED_BRIGHTNESS = false;
+    public static final int MAX_LIGHTS = 20;
 
-    public static final int VRES = 10;        // Virtual resolution of the image
+    public static final int VRES = 2;        // Virtual resolution of the image
     public static final int SAMPLES = 10;     // Number of rays per pixel
-    public static final int MAX_BOUNCES = 2; // Number of bounces per ray
+    public static final int MAX_BOUNCES = 3; // Number of bounces per ray
     public static final int NUM_THREADS = 8;  // MUST BE EVEN
 
     public static final int THREAD_X = WIDTH / (NUM_THREADS / 2);
@@ -58,17 +59,29 @@ public class Main extends Canvas implements Runnable {
         threads[0] = new Thread(this); // Create new thread
         running = true;
         Sphere testSphere = new Sphere(new Point(1000, 500, 500), 200, new Color(255, 0, 0));
-        testSphere.setRoughness(0f);
+        testSphere.setGlossy(1);
         shapeList.add(testSphere);
 
-        Sphere sphere2 = new Sphere(new Point(1500, 800, 2000), 900, new Color(0, 122, 254));
-        sphere2.setRoughness(0f);
-        shapeList.add(sphere2);
         Random rand = new Random();
-        for (int i = 0; i < 2; i++) {
-            shapeList.add(new Lamp(new Point(rand.nextInt(2000), rand.nextInt(1500), rand.nextInt(500)), 100, 1000000000, Color.WHITE));
+        for (int i = 0; i < 3; i++) {
+            //shapeList.add(new Lamp(new Point(rand.nextInt(2000), rand.nextInt(1500), rand.nextInt(500)), 10, 100000, Color.WHITE));
         }
-        movableShape = new Lamp(new Point(-300, 400, 300), 100,1000000000, Color.WHITE);
+        for (int i = 0; i < 50; i++) {
+            Sphere temp = new Sphere(new Point(rand.nextInt(2000), rand.nextInt(1500), rand.nextInt(600) + (50*i)), rand.nextInt(300) + 50, new Color(255, 226, 0));
+            temp.setGlossy(0);
+            for (int ii = 0; ii < 100; ii++) {
+                for (Shape sphere : shapeList) {
+                    if (!(sphere instanceof Sphere))
+                        continue;
+                    if (temp.IsIntersecting((Sphere) sphere)) {
+                        temp = new Sphere(new Point(rand.nextInt(2000), rand.nextInt(1500), rand.nextInt(600) + (50 * i)), rand.nextInt(300) + 50, new Color(251, 255, 100));
+                        temp.setGlossy(0);
+                    }
+                }
+            }
+            shapeList.add(temp);
+        }
+        movableShape = new Lamp(new Point(1700, 300, 300), 200,1000000, new Color(255, 255, 255));
         shapeList.add(movableShape);
         addMouseMotionListener(new MouseMoveListen(this));
 
@@ -81,9 +94,9 @@ public class Main extends Canvas implements Runnable {
      */
     @Override
     public void run() {
-        while(running) {
+        //while(running) {
             SceneRender();
-        }
+        //}
     }
 
     /**
@@ -95,14 +108,27 @@ public class Main extends Canvas implements Runnable {
             this.createBufferStrategy(3);  // If buffer strategy does not exist create a new one
             bs = this.getBufferStrategy();
         }
-        Graphics g = bs.getDrawGraphics(); // Get graphics of buffer strategy
-        render.generateImage(g, shapeList);           // Pass graphics into Render for them to get drawn
-        g.dispose();
-        bs.show(); // Draw the graphics
+
+        for (int x = 0; x < Main.WIDTH; x += Main.VRES) {      // Cycle through pixels, skipping by virtual resolution
+
+            for (int y = 0; y < Main.HEIGHT; y += Main.VRES) {
+
+                render.generatePixel(x, y, shapeList);
+            }
+            if (x % 10 == 0) {
+                Graphics g = bs.getDrawGraphics(); // Get graphics of buffer strategy
+                render.generateImage(g);
+                g.dispose();
+                bs.show(); // Draw the graphics
+            }
+        }
+
+
+        // Pass graphics into Render for them to get drawn
     }
 
     public void OnMouseMove(int x, int y) {
-        if (mainCam != null)
-            movableShape.setPos(new Point(x, y, 400));
+        //if (mainCam != null)
+            //movableShape.setPos(new Point(x, y, 300));
     }
 }

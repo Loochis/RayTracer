@@ -109,9 +109,9 @@ public class VectorMath {
     public static Point ReflectAround(Point ray, Point reflect) {
         float dot = Dot(ray, reflect);
         Point out = new Point();
-        out.setX(-2*dot* reflect.getX());
-        out.setY(-2*dot* reflect.getY());
-        out.setZ(-2*dot* reflect.getZ());
+        out.setX(2*dot* reflect.getX());
+        out.setY(2*dot* reflect.getY());
+        out.setZ(2*dot* reflect.getZ());
         out = Subtract(ray, out);
         return out;
     }

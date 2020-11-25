@@ -11,6 +11,15 @@ public abstract class Shape {
     private Point pos, rot; // Position / Rotation of the shape
     private float scale; // Scale of the shape
     private Color color; // Color of the shape
+    private double glossy;
+
+    public double getGlossy() {
+        return glossy;
+    }
+
+    public void setGlossy(double glossy) {
+        this.glossy = glossy;
+    }
 
     public Shape(Point pos, Point rot, float scale, Color color) {
         this.pos = pos;
